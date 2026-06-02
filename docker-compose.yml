@@ -1,0 +1,132 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────
+  # API
+  # ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Workers
+  # ─────────────────────────────────────────
+  worker-text:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker-text
+    env_file: .env
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  worker-image:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker-image
+    env_file: .env
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  worker-audio:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker-audio
+    env_file: .env
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # PostgreSQL Primary
+  # ─────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: analysis_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Redis
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Kafka + Zookeeper
+  # ─────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Monitoring
+  # ─────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./src/monitoring/prometheus_config.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./src/monitoring/grafana_dashboards:/etc/grafana/provisioning/dashboards
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  grafana_data:
