@@ -45,4 +45,5 @@ redis_data/
 *.pth
 *.onnx
 *.pkl
-models/
+/models/
+ml_models/
