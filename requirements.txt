@@ -5,10 +5,10 @@ strawberry-graphql[fastapi]==0.227.0
 python-multipart==0.0.9
 
 # Database
-sqlalchemy==2.0.30
-alembic==1.13.1
-asyncpg==0.29.0
-psycopg2-binary==2.9.9
+sqlalchemy==2.0.36
+alembic==1.14.0
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
 
 # Cache & messaging
 redis==5.0.4
