@@ -40,6 +40,9 @@ logs/
 postgres_data/
 redis_data/
 
+# Uploads locales (FASE 3: C los reemplazara por GCS/S3)
+uploads/
+
 # ML models (demasiado grandes para git)
 *.pt
 *.pth
