@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     Shutdown: cerrar conexiones limpiamente
     """
     settings = get_settings()
-    print(f"🚀 Iniciando API en modo {settings.app_env}")
+    print(f"[startup] Iniciando API en modo {settings.app_env}")
 
     # Inicializar singleton de DB (crea el pool de conexiones)
     get_db()
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield  # ───── la app corre acá ─────
 
     # Shutdown: cerrar pool de DB
-    print("🛑 Cerrando conexiones...")
+    print("[shutdown] Cerrando conexiones...")
     db = get_db()
     await db.close()
 
