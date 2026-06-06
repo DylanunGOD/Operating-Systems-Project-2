@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     app_port: int = 8000
     app_env: str = "development"
     secret_key: str = "change-me-in-production"
-    jwt_algorithm: str = "RS256"
+    # HS256 simétrico (dev). En producción usar RS256 con par de llaves.
+    jwt_algorithm: str = "HS256"
     jwt_expiration_hours: int = 24
+    jwt_issuer: str = "analysis-distributed-api"
 
     # ─────────────────────────────────────────
     # PostgreSQL Primary

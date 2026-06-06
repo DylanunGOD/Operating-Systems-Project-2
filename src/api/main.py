@@ -17,7 +17,7 @@ from strawberry.fastapi import GraphQLRouter
 
 from src.api.graphql_schema import schema
 from src.api.resolvers import register_handlers
-from src.api.routes import health, upload
+from src.api.routes import auth, health, upload
 from src.database.connection import get_db
 from src.infrastructure.config import get_settings
 
@@ -82,6 +82,7 @@ def create_app() -> FastAPI:
 
     # ─── Rutas ──────────────────────────────────────────
     app.include_router(health.router)
+    app.include_router(auth.router)
     app.include_router(upload.router)
 
     # GraphQL endpoint con GraphiQL UI integrado
