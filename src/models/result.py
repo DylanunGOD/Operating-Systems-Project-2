@@ -75,7 +75,11 @@ class AnalysisResult(Base):
     )
 
     worker_type: Mapped[WorkerType] = mapped_column(
-        SQLEnum(WorkerType, name="worker_type"),
+        SQLEnum(
+            WorkerType,
+            name="worker_type",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
     )
 
@@ -139,12 +143,20 @@ class Incident(Base):
     )
 
     category: Mapped[IncidentCategory] = mapped_column(
-        SQLEnum(IncidentCategory, name="incident_category"),
+        SQLEnum(
+            IncidentCategory,
+            name="incident_category",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
         index=True,
     )
     severity: Mapped[IncidentSeverity] = mapped_column(
-        SQLEnum(IncidentSeverity, name="incident_severity"),
+        SQLEnum(
+            IncidentSeverity,
+            name="incident_severity",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
         index=True,
     )

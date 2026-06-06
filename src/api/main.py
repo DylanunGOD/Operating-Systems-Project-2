@@ -13,7 +13,10 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from strawberry.fastapi import GraphQLRouter
 
+from src.api.graphql_schema import schema
+from src.api.resolvers import register_handlers
 from src.api.routes import health
 from src.database.connection import get_db
 from src.infrastructure.config import get_settings
@@ -35,6 +38,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     # Inicializar singleton de DB (crea el pool de conexiones)
     get_db()
+
+    # Registrar handlers de CQRS (CommandBus + QueryBus)
+    register_handlers()
+    print("[startup] Handlers CQRS registrados")
 
     yield  # ───── la app corre acá ─────
 
@@ -75,6 +82,10 @@ def create_app() -> FastAPI:
 
     # ─── Rutas ──────────────────────────────────────────
     app.include_router(health.router)
+
+    # GraphQL endpoint con GraphiQL UI integrado
+    graphql_app = GraphQLRouter(schema, graphiql=settings.is_development)
+    app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])
 
     # ─── Root ───────────────────────────────────────────
     @app.get("/", tags=["root"])

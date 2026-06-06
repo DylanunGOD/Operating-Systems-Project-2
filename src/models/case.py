@@ -51,7 +51,11 @@ class AnalysisCase(Base):
 
     # ─── Estado y progreso ──────────────────────────────────
     status: Mapped[CaseStatus] = mapped_column(
-        SQLEnum(CaseStatus, name="case_status"),
+        SQLEnum(
+            CaseStatus,
+            name="case_status",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
         nullable=False,
         default=CaseStatus.QUEUED,
         index=True,
