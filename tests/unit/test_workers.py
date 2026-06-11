@@ -310,7 +310,9 @@ class TestConsolidation:
         await _process(
             tw, tcons, _payload("c1", "text", 0, content="te voy a matar")
         )
-        await _process(tw, tcons, _payload("c1", "text", 1, content="tengo una pistola"))
+        await _process(
+            tw, tcons, _payload("c1", "text", 1, content="tengo una pistola")
+        )
         await tw.on_stop()
 
         cw = ConsolidationWorker(
