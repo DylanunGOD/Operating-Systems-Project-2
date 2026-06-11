@@ -30,8 +30,21 @@ ignore_missing_imports = true
 [tool.coverage.run]
 source = ["src"]
 omit = [
+    # Migrations y acceso a BD real: cubiertos por tests de integración.
     "src/database/migrations/*",
-    # Repository: I/O contra PostgreSQL real, cubierto por tests de integración.
     "src/database/repository.py",
+    # Capa de API (A): probada en tests/integration y tests/e2e, no unit.
+    "src/api/*",
+    # Patrones de orquestación (A): cubiertos en tests/integration/test_saga_flow.py
+    "src/patterns/builder.py",
+    "src/patterns/cqrs.py",
+    "src/patterns/message_router.py",
+    "src/patterns/outbox.py",
+    "src/patterns/saga.py",
+    "src/patterns/splitter.py",
+    # Entrypoint de workers: cubierto por tests E2E.
+    "src/monitoring/worker_runner.py",
+    "src/workers/__main__.py",
+    "src/models/schemas.py",
     "tests/*",
 ]

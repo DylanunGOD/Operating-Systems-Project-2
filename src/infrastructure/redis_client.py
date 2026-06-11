@@ -205,7 +205,12 @@ class InMemoryRedisCache:
     todo el sistema sin un Redis real.
     """
 
-    def __init__(self, *, namespace: str = "analysis", default_ttl: float | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        namespace: str = "analysis",
+        default_ttl: float | None = None,
+    ) -> None:
         self._namespace = namespace
         self._default_ttl = default_ttl
         self._data: dict[str, tuple[str, float | None]] = {}

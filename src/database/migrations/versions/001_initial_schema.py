@@ -7,8 +7,8 @@ Create Date: 2026-06-02 00:00:00
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 
@@ -73,12 +73,24 @@ def upgrade() -> None:
         ),
         sa.Column("error_message", sa.String(2000)),
         sa.Column("total_text_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("total_image_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("total_audio_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("processed_text_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("processed_image_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("processed_audio_items", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("case_metadata", postgresql.JSON, nullable=False, server_default="{}"),
+        sa.Column(
+            "total_image_items", sa.Integer(), nullable=False, server_default="0"
+        ),
+        sa.Column(
+            "total_audio_items", sa.Integer(), nullable=False, server_default="0"
+        ),
+        sa.Column(
+            "processed_text_items", sa.Integer(), nullable=False, server_default="0"
+        ),
+        sa.Column(
+            "processed_image_items", sa.Integer(), nullable=False, server_default="0"
+        ),
+        sa.Column(
+            "processed_audio_items", sa.Integer(), nullable=False, server_default="0"
+        ),
+        sa.Column(
+            "case_metadata", postgresql.JSON, nullable=False, server_default="{}"
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -109,7 +121,9 @@ def upgrade() -> None:
         sa.Column("source_file", sa.String(500), nullable=False),
         sa.Column("source_index", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("data", postgresql.JSON, nullable=False, server_default="{}"),
-        sa.Column("processing_time_ms", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column(
+            "processing_time_ms", sa.Integer(), nullable=False, server_default="0"
+        ),
         sa.Column("confidence_score", sa.Float()),
         sa.Column(
             "created_at",
@@ -165,7 +179,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("source_file", sa.String(500), nullable=False),
-        sa.Column("location_data", postgresql.JSON, nullable=False, server_default="{}"),
+        sa.Column(
+            "location_data", postgresql.JSON, nullable=False, server_default="{}"
+        ),
         sa.Column("snippet", sa.String(1000)),
     )
 

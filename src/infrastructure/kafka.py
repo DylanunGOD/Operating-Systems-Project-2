@@ -181,8 +181,10 @@ class KafkaManager:
     # ── Ciclo de vida ────────────────────────────────
     def _ensure_producer(self) -> Any:
         if self._producer is None:
-            Producer = _load_confluent().Producer  # pragma: no cover - real broker
-            self._producer = Producer(_producer_config(self._settings))  # pragma: no cover
+            producer_cls = _load_confluent().Producer  # pragma: no cover - real broker
+            self._producer = producer_cls(  # pragma: no cover
+                _producer_config(self._settings)
+            )
         return self._producer
 
     # ── Contrato KafkaPublisher ──────────────────────
@@ -203,9 +205,8 @@ class KafkaManager:
         def _on_delivery(err: Any, msg: Any) -> None:
             # Corre en el hilo del executor; reprograma en el loop de forma segura.
             if err is not None:
-                loop.call_soon_threadsafe(
-                    _reject, fut, KafkaPublishError(f"entrega fallida en {topic}: {err}")
-                )
+                _err = KafkaPublishError(f"entrega fallida en {topic}: {err}")
+                loop.call_soon_threadsafe(_reject, fut, _err)
             else:
                 loop.call_soon_threadsafe(_resolve, fut, msg)
 
@@ -256,7 +257,7 @@ class KafkaManager:
         bootstrap; en docker-compose ``KAFKA_AUTO_CREATE_TOPICS_ENABLE=true``
         ya los crea al primer uso, así que esto es opcional.
         """
-        confluent = _load_confluent()
+        _load_confluent()
         from confluent_kafka.admin import AdminClient, NewTopic
 
         admin = AdminClient(

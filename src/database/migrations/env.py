@@ -10,11 +10,10 @@ Hace dos cosas clave:
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
 
 # ─── Importar Base + todos los modelos ─────────────────
 # Imprescindible: cada modelo debe importarse para que SQLAlchemy

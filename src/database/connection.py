@@ -7,10 +7,10 @@ Implementa:
 - Singleton: una sola instancia del manager
 """
 
+import random
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from typing import AsyncIterator
-import random
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
