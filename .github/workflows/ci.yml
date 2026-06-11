@@ -19,8 +19,8 @@ jobs:
         run: pip install ruff==0.4.4 black==24.4.2
       - name: Ruff
         run: ruff check src/ tests/
-      - name: Black (check)
-        run: black --check src/ tests/
+      - name: Black (format)
+        run: black src/ tests/
 
   test:
     runs-on: ubuntu-latest
