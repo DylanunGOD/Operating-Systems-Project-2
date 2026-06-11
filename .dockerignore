@@ -1,0 +1,22 @@
+# Contexto de build (docker-compose usa context: . = raíz del repo).
+.git
+.gitignore
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.egg-info/
+uploads/
+docs/
+tests/
+kubernetes/
+*.md
+.env
+.env.*
+!.env.example

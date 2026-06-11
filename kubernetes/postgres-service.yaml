@@ -1,0 +1,16 @@
+# ============================================================
+# PostgreSQL — Service headless (StatefulSet) (Persona C)
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: analysis
+  labels: { app: postgres }
+spec:
+  clusterIP: None        # headless: DNS estable postgres-0.postgres
+  selector: { app: postgres }
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

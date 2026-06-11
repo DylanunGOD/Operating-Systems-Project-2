@@ -29,4 +29,9 @@ ignore_missing_imports = true
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["src/database/migrations/*", "tests/*"]
+omit = [
+    "src/database/migrations/*",
+    # Repository: I/O contra PostgreSQL real, cubierto por tests de integración.
+    "src/database/repository.py",
+    "tests/*",
+]

@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1
+# ============================================================
+# Dockerfile.worker-text — TextWorker (spaCy/HuggingFace)
+# ============================================================
+FROM python:3.11-slim AS base
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    WORKER_TYPE=text
+WORKDIR /app
+
+FROM base AS builder
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/requirements-base.txt docker/requirements-worker-text.txt ./
+RUN pip install --prefix=/install -r requirements-worker-text.txt
+# Modelo de spaCy (opcional). Descomentar si se quiere NER real en la imagen:
+# RUN python -m spacy download en_core_web_sm
+
+FROM base AS runtime
+COPY --from=builder /install /usr/local
+COPY src ./src
+RUN useradd --create-home appuser && chown -R appuser /app
+USER appuser
+EXPOSE 8001
+# worker_runner (Persona C) levanta el servidor de métricas y corre el worker de B.
+CMD ["python", "-m", "src.monitoring.worker_runner", "text"]

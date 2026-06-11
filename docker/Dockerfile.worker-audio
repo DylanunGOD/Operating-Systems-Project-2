@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+# ============================================================
+# Dockerfile.worker-audio — AudioWorker (Whisper)
+# ============================================================
+FROM python:3.11-slim AS base
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    WORKER_TYPE=audio
+WORKDIR /app
+
+FROM base AS builder
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/requirements-base.txt docker/requirements-worker-audio.txt ./
+RUN pip install --prefix=/install -r requirements-worker-audio.txt
+
+FROM base AS runtime
+# Whisper/pydub necesitan ffmpeg en runtime.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /install /usr/local
+COPY src ./src
+RUN useradd --create-home appuser && chown -R appuser /app
+USER appuser
+EXPOSE 8001
+CMD ["python", "-m", "src.monitoring.worker_runner", "audio"]

@@ -1,0 +1,109 @@
+# ============================================================
+# docker-compose.prod.yml — Stack productivo local (Persona C)
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Diferencias vs docker-compose.yml (dev):
+#   - Sin bind-mounts de ./src (imágenes inmutables).
+#   - PostgreSQL con 1 Primary + 2 Réplicas (streaming replication, bitnami).
+#   - Réplicas de API/workers y límites de recursos (deploy.*; aplican en Swarm).
+#   - KAFKA_ENABLED=true en todos los servicios de la app.
+# ============================================================
+version: "3.9"
+
+x-app-env: &app-env
+  KAFKA_ENABLED: "true"
+  APP_ENV: production
+  POSTGRES_HOST: postgres-primary
+  POSTGRES_REPLICA1_HOST: postgres-replica1
+  POSTGRES_REPLICA2_HOST: postgres-replica2
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  REDIS_HOST: redis
+
+services:
+  api:
+    environment:
+      <<: *app-env
+    volumes: []
+    deploy:
+      replicas: 2
+      resources:
+        limits: { cpus: "1.0", memory: 1G }
+      restart_policy: { condition: on-failure }
+
+  worker-text:
+    environment:
+      <<: *app-env
+    deploy:
+      replicas: 2
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+      restart_policy: { condition: on-failure }
+
+  worker-image:
+    environment:
+      <<: *app-env
+    deploy:
+      replicas: 2
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+      restart_policy: { condition: on-failure }
+
+  worker-audio:
+    environment:
+      <<: *app-env
+    deploy:
+      replicas: 2
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+      restart_policy: { condition: on-failure }
+
+  # ── PostgreSQL Primary (bitnami → replicación por env) ──
+  postgres:
+    # Desactivamos el postgres de dev; usamos el clúster de abajo.
+    deploy:
+      replicas: 0
+
+  postgres-primary:
+    image: bitnami/postgresql:15
+    environment:
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRES_REPLICATION_PASSWORD:-replicator_pwd}
+      POSTGRESQL_USERNAME: ${POSTGRES_USER:-postgres}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRESQL_DATABASE: ${POSTGRES_DB:-analysis_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_primary_data:/bitnami/postgresql
+    restart: unless-stopped
+
+  postgres-replica1:
+    image: bitnami/postgresql:15
+    environment:
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRES_REPLICATION_PASSWORD:-replicator_pwd}
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    depends_on:
+      - postgres-primary
+    restart: unless-stopped
+
+  postgres-replica2:
+    image: bitnami/postgresql:15
+    environment:
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRES_REPLICATION_PASSWORD:-replicator_pwd}
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    depends_on:
+      - postgres-primary
+    restart: unless-stopped
+
+volumes:
+  pg_primary_data:

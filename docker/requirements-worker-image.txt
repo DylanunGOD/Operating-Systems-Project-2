@@ -1,0 +1,4 @@
+# ImageWorker: visión por computadora. (Sin estas libs, degrada a heurísticas.)
+-r requirements-base.txt
+opencv-python-headless==4.9.0.80
+ultralytics==8.2.18

@@ -59,12 +59,22 @@ class Settings(BaseSettings):
     # ─────────────────────────────────────────
     # Kafka
     # ─────────────────────────────────────────
+    # kafka_enabled=False (dev): la API usa el ConsoleKafkaPublisher y los
+    # workers el InMemoryConsumer. Ponerlo en True (docker-compose / prod) para
+    # conectar al broker real.
+    kafka_enabled: bool = False
     kafka_bootstrap_servers: str = "localhost:9092"
     kafka_topic_text: str = "analysis.text.tasks"
     kafka_topic_image: str = "analysis.image.tasks"
     kafka_topic_audio: str = "analysis.audio.tasks"
+    kafka_topic_results: str = "analysis.results"
     kafka_group_id: str = "analysis-workers"
     kafka_auto_offset_reset: str = "earliest"
+    kafka_client_id: str = "analysis-platform"
+    # Sondeo de conectividad al construir un consumer/manager real. Si el
+    # broker no responde dentro de este tiempo, la infra lanza
+    # KafkaUnavailableError y los workers caen al InMemoryConsumer (modo dev).
+    kafka_probe_timeout_seconds: float = 5.0
 
     # ─────────────────────────────────────────
     # Workers
@@ -87,6 +97,8 @@ class Settings(BaseSettings):
     prometheus_port: int = 9090
     grafana_port: int = 3000
     grafana_admin_password: str = "admin"
+    # Puerto en el que cada worker expone /metrics (Prometheus lo scrapea).
+    worker_metrics_port: int = 8001
 
     # ─────────────────────────────────────────
     # Propiedades calculadas

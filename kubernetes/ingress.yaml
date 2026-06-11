@@ -1,0 +1,34 @@
+# ============================================================
+# Ingress (Persona C) — expone la API (y opcionalmente Grafana).
+# Requiere un Ingress Controller (nginx) instalado en el clúster.
+# ============================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: analysis-ingress
+  namespace: analysis
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: analysis.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8000
+    - host: grafana.analysis.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000

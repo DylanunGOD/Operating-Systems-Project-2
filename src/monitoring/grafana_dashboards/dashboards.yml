@@ -1,0 +1,14 @@
+# Provider de provisioning: Grafana carga todos los *.json de esta carpeta.
+# Montado en /etc/grafana/provisioning/dashboards (ver docker-compose.yml).
+apiVersion: 1
+
+providers:
+  - name: analysis-dashboards
+    orgId: 1
+    folder: "Analysis Distributed"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

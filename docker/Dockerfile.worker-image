@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+# ============================================================
+# Dockerfile.worker-image — ImageWorker (OpenCV/YOLO)
+# ============================================================
+FROM python:3.11-slim AS base
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    WORKER_TYPE=image
+WORKDIR /app
+
+FROM base AS builder
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/requirements-base.txt docker/requirements-worker-image.txt ./
+RUN pip install --prefix=/install -r requirements-worker-image.txt
+
+FROM base AS runtime
+# OpenCV necesita estas libs del sistema en runtime.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /install /usr/local
+COPY src ./src
+RUN useradd --create-home appuser && chown -R appuser /app
+USER appuser
+EXPOSE 8001
+CMD ["python", "-m", "src.monitoring.worker_runner", "image"]

@@ -1,0 +1,15 @@
+# Nota: el .dockerignore EFECTIVO es el de la raíz del repo (el contexto de
+# build es la raíz, ver docker-compose.yml `context: .`). Este archivo se deja
+# por compatibilidad; mantener sincronizado con /.dockerignore.
+.git
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+htmlcov/
+.coverage
+uploads/
+tests/
+docs/
+*.md
+.env

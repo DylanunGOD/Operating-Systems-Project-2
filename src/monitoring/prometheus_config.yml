@@ -1,0 +1,45 @@
+# ============================================================
+# prometheus_config.yml — Configuración de scraping (Persona C)
+# Montado en el contenedor de Prometheus como /etc/prometheus/prometheus.yml
+# (ver docker-compose.yml).
+# ============================================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    project: analysis-distributed
+
+# Reglas de alerta (mismo directorio montado).
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  # ── Prometheus a sí mismo ──────────────────────────────
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # ── API FastAPI (expone /metrics en su mismo puerto) ───
+  - job_name: api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["api:8000"]
+        labels:
+          component: api
+
+  # ── Workers de análisis (servidor de métricas en :8001) ─
+  # worker_runner.py levanta start_metrics_server(WORKER_METRICS_PORT=8001).
+  - job_name: workers
+    static_configs:
+      - targets: ["worker-text:8001"]
+        labels: { component: worker, worker: text }
+      - targets: ["worker-image:8001"]
+        labels: { component: worker, worker: image }
+      - targets: ["worker-audio:8001"]
+        labels: { component: worker, worker: audio }
+
+# ── Alertmanager (opcional; descomentar si se despliega) ──
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ["alertmanager:9093"]
