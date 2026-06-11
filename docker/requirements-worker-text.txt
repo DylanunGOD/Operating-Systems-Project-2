@@ -1,6 +1,5 @@
-# TextWorker: NLP. (Sin estas libs, el worker degrada a heurísticas.)
+# TextWorker: NLP.
+# spacy/transformers/torch omitidos en la imagen demo → modo heurístico (keyword detection).
+# Para NER real: descomentar spacy==3.7.4 transformers==4.40.2 torch==2.3.0
 -r requirements-base.txt
-spacy==3.7.4
-transformers==4.40.2
-torch==2.3.0
 textblob==0.18.0

@@ -132,17 +132,12 @@ class CreateCaseHandler(CommandHandler[CreateCaseCommand, CreateCaseResult]):
             )
 
             # 2b) Splitter: dividir en sub-tareas + outbox por cada una
+            files_meta = command.metadata.get("files", {})
             subtasks = self._splitter.split(
                 case_id=case.id,
-                text_items=_placeholder_items(
-                    command.text_items_count, "text"
-                ),
-                image_items=_placeholder_items(
-                    command.image_items_count, "image"
-                ),
-                audio_items=_placeholder_items(
-                    command.audio_items_count, "audio"
-                ),
+                text_items=_real_items(files_meta, "text", command.text_items_count),
+                image_items=_real_items(files_meta, "image", command.image_items_count),
+                audio_items=_real_items(files_meta, "audio", command.audio_items_count),
             )
 
             for st in subtasks:
@@ -244,17 +239,30 @@ def register_handlers(
 # Helpers internos
 # ═════════════════════════════════════════════════════
 def _placeholder_items(count: int, type_: str) -> list[dict[str, Any]]:
-    """
-    Genera N items dummy (sin archivo real) para que el Splitter pueda
-    encolar las sub-tareas iniciales.
-
-    Cuando exista el endpoint REST de upload, esos archivos reales
-    reemplazarán estos placeholders.
-    """
     return [
         {"source_file": f"placeholder/{type_}/{i}", "type": type_}
         for i in range(count)
     ]
+
+
+def _real_items(
+    files_meta: dict[str, Any], type_: str, count: int
+) -> list[dict[str, Any]]:
+    """
+    Usa los archivos reales del upload si están disponibles; cae a
+    placeholders solo para llamadas programáticas sin archivos.
+    """
+    items = files_meta.get(type_, [])
+    if items:
+        return [
+            {
+                "source_file": item["source_file"],
+                "original_name": item.get("original_name", ""),
+                "type": type_,
+            }
+            for item in items
+        ]
+    return _placeholder_items(count, type_)
 
 
 # ─────────────────────────────────────────

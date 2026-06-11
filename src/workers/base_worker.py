@@ -186,7 +186,15 @@ class BaseWorker(ABC):
         logger.info("[%s] iniciado", self._name)
         try:
             while not self._stop.is_set():
-                message = await self._consumer.poll(self._poll_timeout)
+                try:
+                    message = await self._consumer.poll(self._poll_timeout)
+                except Exception as poll_err:
+                    logger.warning(
+                        "[%s] error en poll (reintentando en 2s): %s",
+                        self._name, poll_err,
+                    )
+                    await asyncio.sleep(2.0)
+                    continue
                 if message is None:
                     continue
                 self._consumed += 1

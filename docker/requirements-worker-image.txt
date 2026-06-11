@@ -1,4 +1,6 @@
-# ImageWorker: visión por computadora. (Sin estas libs, degrada a heurísticas.)
+# ImageWorker: visión por computadora.
+# ultralytics/torch omitidos en la imagen demo → modo heurístico (filename/metadata detection).
+# Para YOLO real: descomentar ultralytics==8.2.18
 -r requirements-base.txt
 opencv-python-headless==4.9.0.80
-ultralytics==8.2.18
+Pillow==10.3.0

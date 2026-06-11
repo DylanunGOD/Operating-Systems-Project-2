@@ -1,4 +1,5 @@
-# AudioWorker: transcripción. (Sin estas libs, degrada a heurísticas.)
+# AudioWorker: transcripción.
+# openai-whisper/torch omitidos en la imagen demo → modo heurístico (transcript keyword detection).
+# Para Whisper real: descomentar openai-whisper==20231117
 -r requirements-base.txt
-openai-whisper==20231117
 pydub==0.25.1

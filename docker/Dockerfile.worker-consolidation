@@ -14,6 +14,7 @@ FROM base AS builder
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
+RUN pip install --upgrade pip setuptools wheel
 COPY docker/requirements-base.txt ./
 RUN pip install --prefix=/install -r requirements-base.txt
 
