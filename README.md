@@ -64,7 +64,7 @@ Conceptos de Sistemas Operativos aplicados:
 
 ## Patrones de diseño implementados
 
-### Persona B — Capa de procesamiento (workers)
+### Capa de procesamiento — workers
 
 | Patrón | Archivo | Descripción |
 |--------|---------|-------------|
@@ -73,7 +73,7 @@ Conceptos de Sistemas Operativos aplicados:
 | **Strategy** | `src/patterns/strategy.py` | Algoritmo de análisis intercambiable: heurística por defecto, ML cuando los modelos están disponibles, sin cambiar el worker. |
 | **Decorator** | `src/patterns/decorators.py` | Pipeline componible de logging, métricas, reintentos y timing alrededor de cualquier procesador. |
 
-### Persona A / C — Orquestación e infraestructura
+### Orquestación e infraestructura
 
 | Patrón | Archivo | Descripción |
 |--------|---------|-------------|
@@ -244,8 +244,8 @@ Resultado actual: **113 tests unitarios en verde**, cobertura 83 %.
 
 ## Equipo
 
-| Integrante | Rol |
-|-----------|-----|
-| **Dylan** | Arquitectura general, API (FastAPI + GraphQL), patrones de orquestación (CQRS, Builder, Outbox, Splitter, Message Router, Saga, Aggregator) |
-| **Ian** | Infraestructura Docker, Kafka, Prometheus, Grafana, docker-compose |
-| **Arnold** | Workers de procesamiento (Text, Image, Audio, Consolidation), patrones de ejecución (Object Pool, Bulkhead, Strategy, Decorator), tests unitarios FASE 2 |
+| Integrante | Contribución |
+|-----------|-------------|
+| **Dylan** | Arquitectura general, API (FastAPI + GraphQL), patrones de orquestación: CQRS, Builder, Outbox, Splitter, Message Router, Saga, Aggregator |
+| **Ian** | Infraestructura: Docker, Kafka, Zookeeper, Prometheus, Grafana, docker-compose |
+| **Arnold Rojas** | Workers de procesamiento (Text, Image, Audio, Consolidation), patrones de ejecución: Object Pool, Bulkhead, Strategy, Decorator, tests unitarios |
