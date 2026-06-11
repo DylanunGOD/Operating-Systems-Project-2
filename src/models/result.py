@@ -104,7 +104,7 @@ class AnalysisResult(Base):
     )
 
     # ─── Relaciones ─────────────────────────────────────────
-    case: Mapped["AnalysisCase"] = relationship(
+    case: Mapped["AnalysisCase"] = relationship(  # noqa: F821
         "AnalysisCase", back_populates="results"
     )
 
@@ -171,7 +171,7 @@ class Incident(Base):
         nullable=False,
     )
 
-    case: Mapped["AnalysisCase"] = relationship(
+    case: Mapped["AnalysisCase"] = relationship(  # noqa: F821
         "AnalysisCase", back_populates="incidents"
     )
 

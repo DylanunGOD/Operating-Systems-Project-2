@@ -46,8 +46,8 @@ from typing import (
     TypeVar,
 )
 
-I = TypeVar("I")
-O = TypeVar("O")
+I = TypeVar("I")  # noqa: E741
+O = TypeVar("O")  # noqa: E741
 
 logger = logging.getLogger("workers.pipeline")
 

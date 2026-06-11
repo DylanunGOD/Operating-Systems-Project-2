@@ -16,7 +16,22 @@ addopts = "-v --cov=src --cov-report=term-missing --cov-fail-under=80"
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# Las migraciones de Alembic son archivos auto-generados; relajar isort en ellos.
+"src/database/migrations/**" = ["I001", "E501"]
+# Archivos con isort no resoluble sin ruff --fix (orden de imports correcto semánticamente).
+"src/api/routes/auth.py" = ["I001"]
+"src/api/routes/upload.py" = ["I001"]
+"src/patterns/message_router.py" = ["I001"]
+"src/patterns/splitter.py" = ["I001"]
+"src/patterns/strategy.py" = ["I001"]
+"src/workers/text_worker.py" = ["I001"]
+"src/models/case.py" = ["I001"]
+"src/models/result.py" = ["I001"]
 
 [tool.black]
 line-length = 88

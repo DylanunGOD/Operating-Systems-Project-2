@@ -115,7 +115,9 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="Analysis Distributed API",
-        description="Sistema de análisis multiproceso y distribuido de datos de mensajería",
+        description=(
+            "Sistema de análisis multiproceso y distribuido de datos de mensajería"
+        ),
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",

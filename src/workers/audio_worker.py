@@ -130,7 +130,9 @@ def _try_load_whisper() -> Any | None:
 def build_audio_analyzer() -> HeuristicAudioAnalyzer:
     """Factory del analizador: Whisper si se puede, heurístico si no."""
     model = _try_load_whisper()
-    return WhisperAudioAnalyzer(model) if model is not None else HeuristicAudioAnalyzer()
+    if model is not None:
+        return WhisperAudioAnalyzer(model)
+    return HeuristicAudioAnalyzer()
 
 
 # ─────────────────────────────────────────────────────

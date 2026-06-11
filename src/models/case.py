@@ -86,14 +86,14 @@ class AnalysisCase(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     # ─── Relaciones ─────────────────────────────────────────
-    results: Mapped[list["AnalysisResult"]] = relationship(
+    results: Mapped[list["AnalysisResult"]] = relationship(  # noqa: F821
         "AnalysisResult",
         back_populates="case",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
 
-    incidents: Mapped[list["Incident"]] = relationship(
+    incidents: Mapped[list["Incident"]] = relationship(  # noqa: F821
         "Incident",
         back_populates="case",
         cascade="all, delete-orphan",
