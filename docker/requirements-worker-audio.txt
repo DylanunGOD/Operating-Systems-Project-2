@@ -1,0 +1,4 @@
+# AudioWorker: transcripción. (Sin estas libs, degrada a heurísticas.)
+-r requirements-base.txt
+openai-whisper==20231117
+pydub==0.25.1

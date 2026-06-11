@@ -1,0 +1,55 @@
+# ============================================================
+# alerts.yml — Reglas de alerta Prometheus (Persona C)
+# Los nombres de métrica llevan el namespace "analysis" (ver metrics.py).
+# ============================================================
+groups:
+  - name: disponibilidad
+    rules:
+      - alert: APICaida
+        expr: up{job="api"} == 0
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: "La API está caída"
+          description: "El target {{ $labels.instance }} no responde hace 1m."
+
+      - alert: WorkerCaido
+        expr: up{job="workers"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "Worker {{ $labels.worker }} caído"
+          description: "El worker {{ $labels.worker }} ({{ $labels.instance }}) no responde hace 2m."
+
+  - name: errores
+    rules:
+      # Más del 10% de las tareas de un worker fallan (ventana 5m).
+      - alert: WorkerTasaErroresAlta
+        expr: |
+          sum(rate(analysis_worker_failures_total[5m])) by (worker)
+          /
+          clamp_min(
+            sum(rate(analysis_worker_results_total[5m])) by (worker)
+            + sum(rate(analysis_worker_failures_total[5m])) by (worker),
+            1
+          ) > 0.10
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Tasa de errores alta en worker {{ $labels.worker }}"
+          description: "Más del 10% de las tareas de {{ $labels.worker }} fallan (5m)."
+
+  - name: latencia
+    rules:
+      # p95 de procesamiento por encima de 10s (SLO de latencia).
+      - alert: ProcesamientoLento
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(analysis_processor_latency_ms_bucket[5m])) by (le, worker)
+          ) > 10000
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Procesamiento lento en {{ $labels.worker }}"
+          description: "p95 de latencia > 10s en {{ $labels.worker }} (10m)."

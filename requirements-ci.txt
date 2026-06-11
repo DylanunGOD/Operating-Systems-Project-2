@@ -1,0 +1,9 @@
+# Dependencias para CI: núcleo + herramientas de test/lint, SIN librerías de ML.
+# Los workers degradan a heurísticas sin spaCy/YOLO/Whisper, así que los unit
+# tests corren sin esas libs pesadas (CI rápido).
+-r docker/requirements-base.txt
+pytest==8.2.0
+pytest-asyncio==0.23.6
+pytest-cov==5.0.0
+ruff==0.4.4
+black==24.4.2

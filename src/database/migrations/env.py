@@ -10,18 +10,16 @@ Hace dos cosas clave:
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from alembic import context
-
-# ─── Importar Base + todos los modelos ─────────────────
-# Imprescindible: cada modelo debe importarse para que SQLAlchemy
-# lo registre en Base.metadata.
+# Importar Base + todos los modelos para que SQLAlchemy los registre
+# en Base.metadata y Alembic pueda auto-generar migraciones.
 from src.database.connection import Base
 from src.infrastructure.config import get_settings
-from src.models import case, result  # noqa: F401 - registro de modelos
+from src.models import case, result  # noqa: F401
 
 
 # ─── Config de Alembic ─────────────────────────────────

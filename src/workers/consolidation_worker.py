@@ -31,7 +31,7 @@ from typing import Any
 
 from src.models.case import CaseStatus
 from src.models.result import IncidentCategory, IncidentSeverity
-from src.patterns.aggregator import AggregationResult, ResultAggregator
+from src.patterns.aggregator import ResultAggregator
 from src.workers.contracts import (
     EvidenceDraft,
     IncidentDraft,

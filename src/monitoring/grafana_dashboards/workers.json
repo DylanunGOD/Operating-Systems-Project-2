@@ -1,0 +1,54 @@
+{
+  "uid": "workers",
+  "title": "Workers",
+  "tags": ["analysis", "workers"],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Throughput (resultados/s por worker)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(analysis_worker_results_total[5m])) by (worker)",
+          "legendFormat": "{{worker}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Fallos (fallos/s por worker)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(analysis_worker_failures_total[5m])) by (worker)",
+          "legendFormat": "{{worker}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Latencia p95 de procesamiento (ms)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(analysis_processor_latency_ms_bucket[5m])) by (le, worker))",
+          "legendFormat": "p95 {{worker}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

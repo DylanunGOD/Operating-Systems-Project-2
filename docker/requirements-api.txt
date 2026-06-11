@@ -1,0 +1,2 @@
+# La API solo necesita el núcleo (sin ML).
+-r requirements-base.txt

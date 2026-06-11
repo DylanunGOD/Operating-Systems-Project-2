@@ -198,7 +198,9 @@ class ImageWorker(BaseWorker):
 
     content_type = "image"
 
-    def __init__(self, *, analyzer_pool: ObjectPool[Any] | None = None, **kwargs: Any) -> None:
+    def __init__(
+        self, *, analyzer_pool: ObjectPool[Any] | None = None, **kwargs: Any
+    ) -> None:
         super().__init__(**kwargs)
         self._pool = analyzer_pool or ObjectPool(
             factory=build_image_analyzer, max_size=2, min_size=1

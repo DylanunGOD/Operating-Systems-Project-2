@@ -237,8 +237,12 @@ class TestStrategy:
     def test_deadline_order(self) -> None:
         now = datetime.now(timezone.utc)
         q = PriorityTaskQueue(DeadlineStrategy())
-        q.push(ScheduledTask(payload={"id": "later"}, deadline=now + timedelta(hours=2)))
-        q.push(ScheduledTask(payload={"id": "soon"}, deadline=now + timedelta(minutes=5)))
+        q.push(ScheduledTask(
+            payload={"id": "later"}, deadline=now + timedelta(hours=2)
+        ))
+        q.push(ScheduledTask(
+            payload={"id": "soon"}, deadline=now + timedelta(minutes=5)
+        ))
         q.push(ScheduledTask(payload={"id": "none"}))  # sin deadline → al final
         assert [q.pop().payload["id"] for _ in range(3)] == ["soon", "later", "none"]
 

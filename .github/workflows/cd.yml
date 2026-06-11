@@ -1,0 +1,65 @@
+name: CD
+
+# Construye y publica las imágenes a GHCR al hacer push a main o al taggear.
+# El deploy a Kubernetes queda como job manual (requiere KUBECONFIG en secrets).
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - { name: api, file: docker/Dockerfile.api }
+          - { name: worker-text, file: docker/Dockerfile.worker-text }
+          - { name: worker-image, file: docker/Dockerfile.worker-image }
+          - { name: worker-audio, file: docker/Dockerfile.worker-audio }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Login a GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Metadata de tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.name }}
+      - name: Build & push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    # Despliegue manual a Kubernetes (necesita KUBECONFIG configurado).
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: github.event_name == 'workflow_dispatch'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v4
+      - name: Aplicar manifiestos
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
+          export KUBECONFIG=kubeconfig
+          kubectl apply -f kubernetes/

@@ -22,11 +22,6 @@ from typing import Any, Optional
 import strawberry
 
 from src.models.case import CaseStatus
-from src.models.result import (
-    IncidentCategory,
-    IncidentSeverity,
-    WorkerType,
-)
 from src.patterns.cqrs import command_bus, query_bus
 
 

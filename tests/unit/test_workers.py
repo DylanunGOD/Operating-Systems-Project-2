@@ -14,6 +14,7 @@ import asyncio
 import pytest
 
 from src.models.case import CaseStatus
+from src.workers.audio_worker import AudioWorker
 from src.workers.base_worker import BaseWorker
 from src.workers.consolidation_worker import ConsolidationWorker, build_incidents
 from src.workers.contracts import (
@@ -22,10 +23,9 @@ from src.workers.contracts import (
     WorkerAnalysis,
     WorkerTask,
 )
+from src.workers.image_worker import ImageWorker
 from src.workers.messaging import InMemoryConsumer
 from src.workers.stores import InMemoryStore, serialize_analysis
-from src.workers.audio_worker import AudioWorker
-from src.workers.image_worker import ImageWorker
 from src.workers.text_worker import TextWorker
 from src.workers.worker_factory import (
     UnknownWorkerTypeError,
@@ -123,7 +123,9 @@ class TestBaseWorker:
         consumer = InMemoryConsumer()
         store = InMemoryStore()
         store.seed_case("c1", text=1)
-        worker = _DummyWorker(consumer=consumer, store=store, fail=True, poll_timeout=0.05)
+        worker = _DummyWorker(
+            consumer=consumer, store=store, fail=True, poll_timeout=0.05
+        )
 
         await consumer.feed("analysis.text.tasks", _payload("c1", "text", 0))
         task = asyncio.create_task(worker.run_forever())
@@ -154,7 +156,9 @@ class TestSpecializedWorkers:
         worker = TextWorker(consumer=consumer, store=store)
         await worker.on_start()
         await _process(worker, consumer, _payload(
-            "c1", "text", 0, source_file="x.txt", content="te voy a matar con un cuchillo"
+            "c1", "text", 0,
+            source_file="x.txt",
+            content="te voy a matar con un cuchillo",
         ))
         await worker.on_stop()
 
@@ -239,7 +243,8 @@ class TestWorkerFactory:
         factory = build_default_factory()
         consumer = InMemoryConsumer()
         store = InMemoryStore()
-        for ctype, cls in (("text", TextWorker), ("image", ImageWorker), ("audio", AudioWorker)):
+        pairs = [("text", TextWorker), ("image", ImageWorker), ("audio", AudioWorker)]
+        for ctype, cls in pairs:
             worker = factory.create(ctype, consumer=consumer, store=store)
             assert isinstance(worker, cls)
 
@@ -302,8 +307,12 @@ class TestConsolidation:
         tcons = InMemoryConsumer()
         tw = TextWorker(consumer=tcons, store=store)
         await tw.on_start()
-        await _process(tw, tcons, _payload("c1", "text", 0, content="te voy a matar"))
-        await _process(tw, tcons, _payload("c1", "text", 1, content="tengo una pistola"))
+        await _process(
+            tw, tcons, _payload("c1", "text", 0, content="te voy a matar")
+        )
+        await _process(
+            tw, tcons, _payload("c1", "text", 1, content="tengo una pistola")
+        )
         await tw.on_stop()
 
         cw = ConsolidationWorker(

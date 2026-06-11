@@ -1,0 +1,43 @@
+# ============================================================
+# Worker TEXT — Deployment + Service de métricas (Persona C)
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-text
+  namespace: analysis
+  labels: { app: worker-text, worker: text }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: worker-text }
+  template:
+    metadata:
+      labels: { app: worker-text, worker: text }
+    spec:
+      containers:
+        - name: worker-text
+          image: analysis/worker-text:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 8001
+          envFrom:
+            - configMapRef: { name: analysis-config }
+            - secretRef: { name: analysis-secrets }
+          resources:
+            requests: { cpu: "500m", memory: "1Gi" }
+            limits: { cpu: "2", memory: "4Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-text
+  namespace: analysis
+  labels: { app: worker-text }
+spec:
+  selector: { app: worker-text }
+  ports:
+    - name: metrics
+      port: 8001
+      targetPort: 8001
